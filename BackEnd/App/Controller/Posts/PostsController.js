@@ -4,6 +4,7 @@ const router = express.Router();
 const auth = require("../../Middleware/AuthToken");
 
 const Posts = require("../../Schemas/postSchema");
+const Posts = require("../../Schemas/categorySchema");
 
 router.use(auth);
 
