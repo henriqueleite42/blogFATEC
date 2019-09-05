@@ -26,9 +26,6 @@ module.exports = (req, res, next) => {
         }
 
         req.userId = decoded.id;
-        req.admins = [
-            '5d6b4bacd858f5435d87645f'
-        ];
 
         return next();
     })

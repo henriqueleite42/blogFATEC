@@ -13,7 +13,8 @@ const UserSchema = new mongoose.Schema({
     status: {
         type: Number,
         require: true,
-        default: 0
+        default: 0,
+        select: false
     },
     email: {
         type: String,
