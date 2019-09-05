@@ -5,7 +5,7 @@ const TagSchema = new mongoose.Schema({
         type: String,
         require: true
     }
-});
+}, { versionKey: false });
 
 const CommentSchema = new mongoose.Schema({
     text: {
@@ -33,7 +33,7 @@ const CommentSchema = new mongoose.Schema({
         ref: "User",
         require: true
     }
-});
+}, { versionKey: false });
 
 const PostSchema = new mongoose.Schema({
     title: {
@@ -69,7 +69,7 @@ const PostSchema = new mongoose.Schema({
         type: [TagSchema]
     },
     comments: [CommentSchema]
-});
+}, { versionKey: false });
 
 CommentSchema.pre("update", function(next) {
     this.modified = Date.now;

@@ -4,14 +4,14 @@ const router = express.Router();
 const auth = require("../../Middleware/AuthToken");
 
 const Posts = require("../../Schemas/postSchema");
-const Posts = require("../../Schemas/categorySchema");
+const Category = require("../../Schemas/categorySchema");
 
 router.use(auth);
 
 // Exibe todos os pots
 router.get("/", async (req, res) => {
     try {
-        const posts = await Posts.find().populate('author');
+        const posts = await Posts.find().populate('author').populate('comments.author').populate('comments.likedBy');
 
         return res.send({ posts });
     } catch (err) {
@@ -21,14 +21,26 @@ router.get("/", async (req, res) => {
 });
 
 // Exibe um post especifico
-router.get("/:postUrl", async (req, res) => {
+router.get("/:postId", async (req, res) => {
     try {
-        const post = await Posts.findById(req.params.postUrl).populate('author');
+        const post = await Posts.findById(req.params.postId).populate('author').populate('comments.author').populate('comments.likedBy');
 
         return res.send({ post });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Finding Posts" });
+        return res.status(400).send({ error: "Error Finding Post" });
+    }
+});
+
+// Exibe todos os post de determinado autor
+router.get("/author/:authorId", async (req, res) => {
+    try {
+        const post = await Posts.findOne({ author: req.params.authorId }).populate('author').populate('comments.author').populate('comments.likedBy');
+
+        return res.send({ post });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({ error: "Error Finding Post" });
     }
 });
 
@@ -61,7 +73,7 @@ router.put("/:postId", async (req, res) => {
         return res.send({ post });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Creating New Post" });
+        return res.status(400).send({ error: "Error Updating New Post" });
     }
 });
 
@@ -76,7 +88,7 @@ router.delete("/:postId", async (req, res) => {
         return res.send({ ok: true });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Finding Posts" });
+        return res.status(400).send({ error: "Error Deleting Post" });
     }
 });
 
