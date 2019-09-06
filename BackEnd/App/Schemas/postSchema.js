@@ -1,12 +1,5 @@
 const mongoose = require("../../Database");
 
-const TagSchema = new mongoose.Schema({
-    tag: {
-        type: String,
-        require: true
-    }
-}, { versionKey: false });
-
 const CommentSchema = new mongoose.Schema({
     text: {
         type: String,
@@ -65,8 +58,9 @@ const PostSchema = new mongoose.Schema({
         ref: "User",
         require: true
     },
-    tags: {
-        type: [TagSchema]
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category"
     },
     comments: [CommentSchema]
 }, { versionKey: false });

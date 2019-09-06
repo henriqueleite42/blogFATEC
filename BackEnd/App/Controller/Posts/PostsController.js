@@ -4,7 +4,7 @@ const router = express.Router();
 const auth = require("../../Middleware/AuthToken");
 
 const Posts = require("../../Schemas/postSchema");
-const Category = require("../../Schemas/categorySchema");
+const Categories = require("../../Schemas/categorySchema");
 
 router.use(auth);
 
@@ -50,10 +50,14 @@ router.post("/", async (req, res) => {
         return res.status(403).send({ error: "No Permission To Access This Resource" });
     }
     try {
+        const { category } = req.body;
+
         const post = await Posts.create({
             ...req.body,
             author: req.userId
         });
+
+        await Categories.findByIdAndUpdate(category, { $inc: { uses: 1 } }, { new: true });
 
         return res.send({ post });
     } catch (err) {
@@ -68,7 +72,9 @@ router.put("/:postId", async (req, res) => {
         return res.status(403).send({ error: "No Permission To Access This Resource" });
     }
     try {
-        const post = await Posts.findByIdAndUpdate(req.params.postId, { ...req.body }, { new: true });
+        const { title, text } = req.body;
+
+        const post = await Posts.findByIdAndUpdate(req.params.postId, { title, text }, { new: true });
 
         return res.send({ post });
     } catch (err) {
@@ -77,12 +83,18 @@ router.put("/:postId", async (req, res) => {
     }
 });
 
-// Delete um Post
+// Delete um Post e -1 dos usos da Categoria
 router.delete("/:postId", async (req, res) => {
     if ( ! req.admins.includes(req.userId) ) {
         return res.status(403).send({ error: "No Permission To Access This Resource" });
     }
     try {
+        const category = await Posts.findOne({ _id: req.params.postId }, { category: 1 });
+
+        if (category != undefined) {
+            Categories.findByIdAndUpdate(category.name, { $inc: { uses: -1 } }, { new: true });
+        }
+
         await Posts.findByIdAndRemove(req.params.postId);
 
         return res.send({ ok: true });
