@@ -1,11 +1,9 @@
-const admins = [
-    '5d6b4bacd858f5435d87645f'
-];
+const adm = require('../../Config/Adm.json');
 
 module.exports = (req, res, next) => {
-    if ( req.userId.includes( admins ) ) {
+    if ( req.userId.includes( adm.admins ) ) {
         return next();
     } else {
-        return res.status(403).send({ error: "No Authorization" });
+        return res.status(403).send({ error: 'No Authorization' });
     }
 }
