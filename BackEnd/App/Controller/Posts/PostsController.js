@@ -1,99 +1,116 @@
 const express = require('express');
 const router = express.Router();
 
-const auth = require("../../Middleware/AuthToken");
+const adm = require('../../Middleware/Adm');
+const auth = require('../../Middleware/AuthToken');
 
-const Posts = require("../../Schemas/postSchema");
-const Category = require("../../Schemas/categorySchema");
+const Posts = require('../../Schemas/postSchema');
+const Categories = require('../../Schemas/categorySchema');
 
 router.use(auth);
 
-// Exibe todos os pots
-router.get("/", async (req, res) => {
+// Exibe todos os posts
+router.get('/', async (req, res) => {
     try {
-        const posts = await Posts.find().populate('author').populate('comments.author').populate('comments.likedBy');
+        const posts = await Posts.find().populate('author').populate('category').select('-comments');
 
         return res.send({ posts });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Finding Posts" });
+        return res.status(400).send({ error: 'Error Finding Posts' });
     }
 });
 
 // Exibe um post especifico
-router.get("/:postId", async (req, res) => {
+router.get('/:postId', async (req, res) => {
     try {
-        const post = await Posts.findById(req.params.postId).populate('author').populate('comments.author').populate('comments.likedBy');
+        const post = await Posts.findById(req.params.postId).populate('author').populate('comments.author').populate('category').populate('comments.likedBy').select('+likedBy');
 
         return res.send({ post });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Finding Post" });
+        return res.status(400).send({ error: 'Error Finding Post' });
     }
 });
 
 // Exibe todos os post de determinado autor
-router.get("/author/:authorId", async (req, res) => {
+router.get('/author/:authorId', async (req, res) => {
     try {
-        const post = await Posts.findOne({ author: req.params.authorId }).populate('author').populate('comments.author').populate('comments.likedBy');
+        const post = await Posts.findOne({ author: req.params.authorId }).populate('author').populate('category').select('-comments');
 
         return res.send({ post });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Finding Post" });
+        return res.status(400).send({ error: 'Error Finding Posts' });
+    }
+});
+
+// Exibe todos os post de determinada Categoria
+router.get('/category/:categoryId', async (req, res) => {
+    try {
+        const post = await Posts.find({ category: req.params.categoryId }).populate('author').populate('category').select('-comments');
+
+        return res.send({ post });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({ error: 'Error Finding Posts' });
     }
 });
 
 // Cria um novo Post
-router.post("/", async (req, res) => {
-    if ( !req.admins.includes(req.userId) ) {
-        return res.status(403).send({ error: "No Permission To Access This Resource" });
-    }
+router.post('/', adm, async (req, res) => {
     try {
+        const { category } = req.body;
+
         const post = await Posts.create({
             ...req.body,
             author: req.userId
         });
 
+        await Categories.findByIdAndUpdate(category, { $inc: { uses: 1 } }, { new: true });
+
         return res.send({ post });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Creating New Post" });
+        return res.status(400).send({ error: 'Error Creating New Post' });
     }
 });
 
 // Atualiza um Post
-router.put("/:postId", async (req, res) => {
-    if ( ! req.admins.includes(req.userId) ) {
-        return res.status(403).send({ error: "No Permission To Access This Resource" });
-    }
+router.put('/:postId', adm, async (req, res) => {
     try {
-        const post = await Posts.findByIdAndUpdate(req.params.postId, { ...req.body }, { new: true });
+        const { title, text } = req.body;
+
+        const post = await Posts.findByIdAndUpdate(req.params.postId, { title, text }, { new: true });
 
         return res.send({ post });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Updating New Post" });
+        return res.status(400).send({ error: 'Error Updating New Post' });
     }
 });
 
-// Delete um Post
-router.delete("/:postId", async (req, res) => {
-    if ( ! req.admins.includes(req.userId) ) {
-        return res.status(403).send({ error: "No Permission To Access This Resource" });
-    }
+// Delete um Post e -1 dos usos da Categoria
+router.delete('/:postId', adm, async (req, res) => {
     try {
+        const category = await Posts.findOne({ _id: req.params.postId }, { category: 1 });
+
+        await Categories.findOneAndUpdate(
+            { _id: category.category },
+            { '$inc': { 'uses': -1 } }
+        );
+
         await Posts.findByIdAndRemove(req.params.postId);
 
         return res.send({ ok: true });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Error Deleting Post" });
+        return res.status(400).send({ error: 'Error Deleting Post' });
     }
 });
 
 // Gerencia os Likes de um Post
-router.put("/like/:postId", async (req, res) => {
+router.put('/like/:postId', async (req, res) => {
     try {
         const post = await Posts.findOne({ _id: req.params.postId });
 
@@ -105,7 +122,7 @@ router.put("/like/:postId", async (req, res) => {
                 if ( likes.includes(req.userId) ) {
                     const newPost = await Posts.findOneAndUpdate(
                         { _id: req.params.postId },
-                        { "$pull": { "likedBy": req.userId } },
+                        { '$pull': { 'likedBy': req.userId } },
                         { returnOriginal: false }
                     );
                     return res.send({ newPost });
@@ -113,7 +130,7 @@ router.put("/like/:postId", async (req, res) => {
             } else {
                 const newPost = await Posts.findOneAndUpdate(
                     { _id: req.params.postId },
-                    { "$push": { "likedBy": req.userId } },
+                    { '$push': { 'likedBy': req.userId } },
                     { returnOriginal: false }
                 );
                 return res.send({ newPost });
@@ -121,8 +138,8 @@ router.put("/like/:postId", async (req, res) => {
         }
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: "Unexpected Error" });
+        return res.status(400).send({ error: 'Unexpected Error' });
     }
 });
 
-module.exports = app => app.use("/posts", router);
+module.exports = app => app.use('/posts', router);

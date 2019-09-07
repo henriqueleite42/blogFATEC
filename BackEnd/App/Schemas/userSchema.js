@@ -1,5 +1,5 @@
-const mongoose = require("../../Database");
-const bcrypt = require("bcryptjs");
+const mongoose = require('../../Database');
+const bcrypt = require('bcryptjs');
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -13,8 +13,7 @@ const UserSchema = new mongoose.Schema({
     status: {
         type: Number,
         require: true,
-        default: 0,
-        select: false
+        default: 0
     },
     email: {
         type: String,
@@ -35,12 +34,12 @@ const UserSchema = new mongoose.Schema({
     }
 });
 
-UserSchema.pre("save", async function(next) {
+UserSchema.pre('save', async function(next) {
     const hash = await bcrypt.hash(this.password, 10);
     this.password = hash;
     next();
 });
 
-const User = mongoose.model("User", UserSchema);
+const User = mongoose.model('User', UserSchema);
 
 module.exports = User;

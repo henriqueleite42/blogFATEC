@@ -1,25 +1,13 @@
-const mongoose = require("../../Database");
-
-const TagSchema = new mongoose.Schema({
-    tag: {
-        type: String,
-        require: true
-    }
-}, { versionKey: false });
+const mongoose = require('../../Database');
 
 const CommentSchema = new mongoose.Schema({
     text: {
         type: String,
         require: true
     },
-    status: {
-        type: Number,
-        require: true,
-        default: 0
-    },
     likedBy: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
     }],
     created: {
         type: Date,
@@ -30,7 +18,7 @@ const CommentSchema = new mongoose.Schema({
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
         require: true
     }
 }, { versionKey: false });
@@ -48,39 +36,33 @@ const PostSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    modified: {
-        type: Date
-    },
     likedBy: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
+        select: false
     }],
-    status: {
-        type: Number,
-        require: true,
-        default: 0
-    },
     author: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
         require: true
     },
-    tags: {
-        type: [TagSchema]
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category'
     },
     comments: [CommentSchema]
 }, { versionKey: false });
 
-CommentSchema.pre("update", function(next) {
+CommentSchema.pre('update', function(next) {
     this.modified = Date.now;
     next();
 });
 
-CommentSchema.pre("save", function(req, res, next) {
+CommentSchema.pre('save', function(req, res, next) {
     this.author = req.userId;
     next();
 });
 
-const Post = mongoose.model("Post", PostSchema);
+const Post = mongoose.model('Post', PostSchema);
 
 module.exports = Post;
