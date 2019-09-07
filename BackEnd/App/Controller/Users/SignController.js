@@ -14,9 +14,14 @@ function generateToken(params = {}) {
 
 
 router.post('/register', async (req, res) => {
+    const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
     const { email } = req.body;
 
     try {
+        if (await  ! emailRegex.test(email)) {
+            return res.status(400).send({error: 'Invalid E-mail.'});
+        }
+
         if (await User.findOne({ email })) {
             return res.status(400).send({error: 'User Already Exists.'});
         }
