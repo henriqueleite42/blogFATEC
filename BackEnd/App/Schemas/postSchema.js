@@ -16,6 +16,9 @@ const CommentSchema = new mongoose.Schema({
     modified: {
         type: Date
     },
+    answer: {
+        type: mongoose.Schema.Types.ObjectId
+    },
     author: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -52,16 +55,6 @@ const PostSchema = new mongoose.Schema({
     },
     comments: [CommentSchema]
 }, { versionKey: false });
-
-CommentSchema.pre('update', function(next) {
-    this.modified = Date.now;
-    next();
-});
-
-CommentSchema.pre('save', function(req, res, next) {
-    this.author = req.userId;
-    next();
-});
 
 const Post = mongoose.model('Post', PostSchema);
 
