@@ -33,7 +33,7 @@ router.put('/:commentId', async (req, res) => {
         if (checkAuthor.author._id == req.userId) {
             const comment = await Posts.update(
                 { 'comments._id': req.params.commentId },
-                { '$set': { 'comments.$.text': req.body.text } }
+                { '$set': { 'comments.$.text': req.body.text, 'comments.$.modified': Date.now } }
             );
         }
 
