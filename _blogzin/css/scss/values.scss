@@ -1,0 +1,11 @@
+:root {
+	--clr-main: rgb(137, 8, 38);
+	--clr-menu-txt: rgb(255,255,255);
+	--clr-menu-bg: rgb(0,0,0);
+	--clr-sec-title: rgb(0,0,0);
+}
+
+$clr-main: var(--clr-main);
+$clr-menu-txt: var(--clr-menu-txt);
+$clr-menu-bg: var(--clr-menu-bg);
+$clr-sec-title: var(--clr-sec-title);
