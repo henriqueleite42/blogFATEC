@@ -15,16 +15,21 @@ function generateToken(params = {}) {
 
 router.post('/register', async (req, res) => {
     const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
 
     try {
-        const { email } = req.body;
+        const { email, password } = req.body;
 
         if (await  ! emailRegex.test(email)) {
-            return res.status(400).send({error: 'Invalid E-mail.'});
+            return res.status(400).send({ error: 'Invalid E-mail.' });
         }
 
         if (await User.findOne({ email })) {
-            return res.status(400).send({error: 'User Already Exists.'});
+            return res.status(400).send({ error: 'User Already Exists.' });
+        }
+
+        if (await ! passwordRegex.test(password)) {
+            return res.status(400).send({ error: 'Invalid Password' });
         }
 
         const user = await User.create( req.body );
