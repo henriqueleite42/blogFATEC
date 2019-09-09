@@ -1,0 +1,9 @@
+:root {
+  --clr-main: rgb(220, 220, 245);
+  --clr-constrast: rgb(141, 108, 251);
+  --clr-menu-txt: rgb(0, 0, 0);
+  --clr-menu-bg: rgb(255, 255, 255);
+  --clr-sec-title: rgb(0,0,0);
+  --clr-sec-txt: rgb(255, 255, 255);
+  --clr-border: rgb(0,0,0);
+}
