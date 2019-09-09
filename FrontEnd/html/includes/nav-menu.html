@@ -1,0 +1,39 @@
+<div class="align">
+	<ul>
+		<a href="index.html">
+			<li>Menu I</li>
+		</a>
+		<a href="#">
+			<li>Menu II</li>
+		</a>
+		<li>
+			<input type="checkbox" class="showmenu-controller">
+
+			<label>
+				<input type="checkbox" onchange="displaySubmenu(this)">
+				<div tabindex="0">Drop Menu<i class="fa fa-angle-down"></i></div>
+			</label>
+
+			<ul class="submenu">
+				<a href="#">
+					<li>Item I</li>
+				</a>
+				<a href="#">
+					<li>Item II</li>
+				</a>
+
+			</ul>
+		</li>
+	</ul>
+
+	<div id="search-login-holder">
+		<div id="nav-search">
+			<input type="text" placeholder="Pesquisar...">
+			<button><i class="fa fa-search"></i></button>
+		</div>
+
+		<a href="login.html" class="user-login" title="Login">
+			<i class="fa fa-user-circle"></i>
+		</a>
+	</div>
+</div>

@@ -1,0 +1,355 @@
+@import url("https://fonts.googleapis.com/css?family=Open+Sans");
+@import url("https://fonts.googleapis.com/css?family=Roboto");
+:root {
+  --clr-main: rgb(64, 110, 4);
+  --clr-constrast: rgb(141, 108, 251);
+  --clr-menu-txt: rgb(0, 0, 0);
+  --clr-menu-bg: rgb(255, 255, 255);
+  --clr-sec-title: rgb(0,0,0);
+  --clr-sec-txt: rgb(255, 255, 255);
+  --clr-border: rgb(0,0,0);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', 'Roboto', 'Calibri', sans-serif;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  outline-color: var(--clr-constrast);
+}
+
+.fade {
+  -webkit-animation: change ease;
+          animation: change ease;
+  -webkit-animation-duration: 1s;
+          animation-duration: 1s;
+}
+
+@-webkit-keyframes change {
+  from {
+    -webkit-filter: brightness(0);
+            filter: brightness(0);
+  }
+  to {
+    -webkit-filter: brightness(1);
+            filter: brightness(1);
+  }
+}
+
+@keyframes change {
+  from {
+    -webkit-filter: brightness(0);
+            filter: brightness(0);
+  }
+  to {
+    -webkit-filter: brightness(1);
+            filter: brightness(1);
+  }
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+}
+
+.sec-title {
+  text-align: center;
+  font-size: 28px;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-weight: lighter;
+  text-transform: uppercase;
+  color: var(--clr-sec-title);
+}
+
+.align {
+  width: 100%;
+  max-width: 1080px;
+  margin: auto;
+}
+
+main.align {
+  margin: 16px auto;
+}
+
+#main-header {
+  height: 40vh;
+  width: 100%;
+  position: relative;
+  -webkit-animation: change 1.5s ease-in;
+          animation: change 1.5s ease-in;
+}
+
+#main-header .filter {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  background: -webkit-gradient(linear, left top, left bottom, from(black), to(var(--clr-main)));
+  background: linear-gradient(black, var(--clr-main));
+  opacity: .5;
+  z-index: 1;
+}
+
+#main-header .bg {
+  background: url("../img/bg.jpg") fixed no-repeat center;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  -webkit-filter: grayscale(0.8) brightness(0.5);
+          filter: grayscale(0.8) brightness(0.5);
+}
+
+#main-header img {
+  -webkit-filter: invert(1) drop-shadow(0 0 10px black);
+          filter: invert(1) drop-shadow(0 0 10px black);
+  max-height: 15vh;
+  max-width: 80%;
+  position: absolute;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+}
+
+#nav-menu {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  background: var(--clr-menu-bg);
+  -webkit-box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+#nav-menu * {
+  color: var(--clr-menu-txt);
+}
+
+#nav-menu .align {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+#nav-menu .align ul {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  list-style: none;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+#nav-menu .align ul a {
+  padding: 12px 24px;
+  text-decoration: none;
+  -webkit-transition: background-color .15s ease-in;
+  transition: background-color .15s ease-in;
+}
+
+#nav-menu .align ul a:hover, #nav-menu .align ul a:focus {
+  background: var(--clr-main);
+}
+
+#nav-menu .align ul a li {
+  color: var(--clr-menu-txt);
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: relative;
+}
+
+#nav-menu .align ul li input[type="checkbox"] {
+  display: none;
+}
+
+#nav-menu .align ul li label div {
+  color: var(--clr-menu-txt);
+  font-size: 18px;
+  font-weight: bold;
+  text-transform: uppercase;
+  position: relative;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 12px 24px;
+  cursor: pointer;
+}
+
+#nav-menu .align ul li label div i {
+  -webkit-transition: -webkit-transform .1s ease-in;
+  transition: -webkit-transform .1s ease-in;
+  transition: transform .1s ease-in;
+  transition: transform .1s ease-in, -webkit-transform .1s ease-in;
+  margin-left: 4px;
+}
+
+#nav-menu .align ul li:hover div {
+  background: var(--clr-main);
+}
+
+@media screen and (min-width: 1080px) {
+  #nav-menu .align ul li:hover div, #nav-menu .align ul li:focus div, #nav-menu .align ul li:focus-within div {
+    background: var(--clr-main);
+  }
+  #nav-menu .align ul li:hover div i, #nav-menu .align ul li:focus div i, #nav-menu .align ul li:focus-within div i {
+    -webkit-transform: rotate(-180deg);
+            transform: rotate(-180deg);
+  }
+  #nav-menu .align ul li:hover .submenu, #nav-menu .align ul li:focus .submenu, #nav-menu .align ul li:focus-within .submenu {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    opacity: 1;
+  }
+}
+
+#nav-menu .align ul .submenu {
+  max-width: 200px;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  opacity: 0;
+  display: none;
+  -webkit-transition: opacity .2s ease;
+  transition: opacity .2s ease;
+  position: absolute;
+  background: var(--clr-menu-bg);
+  -webkit-box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+#nav-menu .align ul .submenu a {
+  min-width: 100%;
+}
+
+#nav-menu .align #search-login-holder {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  min-height: 100%;
+}
+
+#nav-menu .align #search-login-holder #nav-search {
+  border: 1px solid var(--clr-menu-txt);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  height: 32px;
+  margin: auto 0;
+}
+
+#nav-menu .align #search-login-holder #nav-search input {
+  background: transparent;
+  border: none;
+  border-right: inherit;
+  padding: 8px;
+}
+
+#nav-menu .align #search-login-holder #nav-search button {
+  border: none;
+  background: none;
+  padding: 0 8px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#nav-menu .align #search-login-holder .user-login {
+  margin-left: 12px;
+}
+
+#nav-menu .align #search-login-holder .user-login i {
+  font-size: 24px;
+  -webkit-transition: color .2s ease;
+  transition: color .2s ease;
+}
+
+#nav-menu .align #search-login-holder .user-login:hover i {
+  color: var(--clr-constrast);
+}
+
+@media screen and (max-width: 1080px) {
+  main.align {
+    max-width: 95%;
+  }
+  #nav-menu .align {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+  #nav-menu .align ul {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+  }
+  #nav-menu .align ul li,
+  #nav-menu .align ul a {
+    width: 100%;
+  }
+  #nav-menu .align ul li .showmenu-controller:checked ~ label div {
+    background: var(--clr-main);
+  }
+  #nav-menu .align ul li .showmenu-controller:checked ~ label div i {
+    -webkit-transform: rotate(-180deg);
+            transform: rotate(-180deg);
+  }
+  #nav-menu .align ul li .showmenu-controller:checked ~ .submenu {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    opacity: 1;
+  }
+  #nav-menu .align ul li .submenu {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    -webkit-box-shadow: none;
+            box-shadow: none;
+  }
+  #nav-menu .align ul li .submenu a li {
+    text-indent: 16px;
+    text-transform: capitalize;
+  }
+  #nav-menu .align #search-login-holder {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: column;
+            flex-direction: column;
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+  }
+  #nav-menu .align #search-login-holder #nav-search {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  #nav-menu .align #search-login-holder #nav-search input[type="text"] {
+    width: 100%;
+  }
+  #nav-menu .align #search-login-holder .user-login {
+    display: none;
+  }
+  #main-header {
+    display: none;
+  }
+}
