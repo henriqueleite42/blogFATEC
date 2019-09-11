@@ -9,6 +9,12 @@ const Categories = require('../../Schemas/categorySchema');
 
 router.use(auth);
 
+/***************************************************************************
+ *
+ *                       Exibição
+ *
+ ***************************************************************************/
+
 // Exibe todos os posts
 router.get('/', async (req, res) => {
     try {
@@ -56,6 +62,25 @@ router.get('/category/:categoryId', async (req, res) => {
         return res.status(400).send({ error: 'Error Finding Posts' });
     }
 });
+
+// Exibe os posts com maior numero de likes
+router.get('/popular/:qtd', async (req, res) => {
+    try {
+        const post = await Posts.find().sort({ likedBy: -1 }).limit(parseInt(req.params.qtd)).select(['-comments', '-text']);
+
+        return res.send({ post });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({ error: 'Error Finding Posts' });
+    }
+});
+
+
+/***************************************************************************
+ *
+ *                       CRUD
+ *
+ ***************************************************************************/
 
 // Cria um novo Post
 router.post('/', adm, async (req, res) => {
@@ -108,6 +133,12 @@ router.delete('/:postId', adm, async (req, res) => {
         return res.status(400).send({ error: 'Error Deleting Post' });
     }
 });
+
+/***************************************************************************
+ *
+ *                       LIKES
+ *
+ ***************************************************************************/
 
 // Gerencia os Likes de um Post
 router.put('/like/:postId', async (req, res) => {
