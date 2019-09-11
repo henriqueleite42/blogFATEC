@@ -12,7 +12,7 @@ function generateToken(params = {}) {
     return jwt.sign(params, authKey.secret, { expiresIn: 259200000 });
 }
 
-
+//Register
 router.post('/register', async (req, res) => {
     const emailRegex = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
@@ -43,6 +43,7 @@ router.post('/register', async (req, res) => {
     }
 });
 
+//LogIn
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -65,6 +66,7 @@ router.post('/login', async (req, res) => {
     }
 });
 
+//LogOut
 router.post('/logout', async (req, res) => {
     try {
         res.clearCookie('blogFATEC');
