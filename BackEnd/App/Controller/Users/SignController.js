@@ -52,11 +52,20 @@ router.post('/login', async (req, res) => {
             return res.status(400).send({ error: 'Invalid Password.'});
         }
 
-        res.cookie('blogFatec', generateToken({ id: user._id }), { maxAge: 259200000, httpOnly: true });
+        res.cookie('blogFatec', 'Bearer'+generateToken({ id: user._id }), { maxAge: 259200000, httpOnly: true });
 
         return res.send({ ok: true });
     } catch (err) {
         return res.status(400).send({ error: 'Login Fail.'});
+    }
+});
+
+router.post('/logout', async (req, res) => {
+    try {
+        res.clearCookie('blogFATEC');
+        return res.send({ ok: true });
+    } catch (err) {
+        return res.status(400).send({ error: 'Logout Fail.'});
     }
 });
 
