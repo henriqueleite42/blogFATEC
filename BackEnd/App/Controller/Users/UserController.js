@@ -15,10 +15,15 @@ router.get('/', async (req, res) => {
     try {
         const users = await Users.find().select(['+created', '+email', '+status']);
 
-        return res.send({ users });
+        return res.send({
+            status: 'OK',
+            results: users
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Finding Users' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -27,27 +32,69 @@ router.get('/:userId', async (req, res) => {
     try {
         const user = await Users.findById(req.params.userId).select(['+created', '+email', '+status']);
 
-        return res.send({ user });
+        return res.send({
+            status: 'OK',
+            results: user
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Finding User' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
-// Delete User
+// Delete User and User Comments
 router.delete('/:userId', async (req, res) => {
     try {
-        await Posts.update(
-            { 'comments._id': req.params.commentId },
-            { $pull: { 'comments': { _id: req.params.commentId } } }
-        );
 
-        await Posts.findByIdAndRemove(req.params.userId);
+        await Users.findByIdAndRemove(req.params.userId);
 
-        return res.send({ ok: true });
+        return res.send({
+            status: 'OK'
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Deleting User' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
+    }
+});
+
+//BookMarks
+router.put('/bookmark/:postId', async (req, res) => {
+    try {
+        const user = await Users.findOne({ _id: req.userId });
+
+        const bookmarks = user.bookmarks;
+        if (bookmarks != undefined && bookmarks.includes(req.params.postId)) {
+            if ( bookmarks.includes(req.params.postId) ) {
+                await Users.findOneAndUpdate(
+                    { _id: req.userId },
+                    { '$pull': { 'bookmarks': req.params.postId } },
+                    { returnOriginal: false }
+                );
+
+                return res.send({
+                    status: 'OK'
+                });
+            }
+        } else {
+            await Users.findOneAndUpdate(
+                { _id: req.userId },
+                { '$push': { 'bookmarks': req.params.postId } },
+                { returnOriginal: false }
+            );
+
+            return res.send({
+                status: 'OK'
+            });
+        }
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 

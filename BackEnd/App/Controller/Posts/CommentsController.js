@@ -18,10 +18,15 @@ router.post('/:postId', async (req, res) => {
 
         await Posts.findByIdAndUpdate(req.params.postId, { $push: { comments: comment } });
 
-        return res.send({ comment });
+        return res.send({
+            status: 'OK',
+            results: comment
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Creating New Comment' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -30,17 +35,31 @@ router.put('/:commentId', async (req, res) => {
     try {
         const checkAuthor = await Posts.findOne({ 'comments._id': req.params.commentId });
 
+        if ( ! checkAuthor.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
+        }
+
+        var comment;
+
         if (checkAuthor.author._id == req.userId) {
-            const comment = await Posts.update(
+            comment = await Posts.update(
                 { 'comments._id': req.params.commentId },
                 { '$set': { 'comments.$.text': req.body.text, 'comments.$.modified': Date.now } }
             );
         }
 
-        return res.send({ comment });
+        return res.send({
+            status: 'OK',
+            results: comment
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Updating Comment' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -58,13 +77,17 @@ router.delete('/:commentId', async (req, res) => {
                 { $pull: { 'comments': { _id: req.params.commentId } } }
             );
 
-            return res.send({ ok: true });
+            return res.send({
+                status: 'OK'
+            });
         } else {
             return res.status(403).send({ error: "No Authorization" });
         }
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Deleting Comment' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -77,30 +100,44 @@ router.put('/like/:commentId', async (req, res) => {
         );
 
         if (post == null) {
-            return res.status(404).send({ error: 'Comment Not Find' });
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
         } else {
             const comment = post.comments[0];
 
+            if (comment == null || typeof comment == 'undefined') {
+                return res.status(404).send({
+                    status: 'ZERO_RESULTS',
+                    results: []
+                });
+            }
+
             if (comment.likedBy != undefined && comment.likedBy.includes(req.userId)) {
-                const newPost = await Posts.findOneAndUpdate(
+                await Posts.findOneAndUpdate(
                     { comments: { $elemMatch: { _id: req.params.commentId } } },
                     { '$pull': { 'comments.$.likedBy': req.userId } },
                     { returnOriginal: false }
                 );
-                return res.send({ newPost });
             } else {
-                const newPost = await Posts.findOneAndUpdate(
+                await Posts.findOneAndUpdate(
                     { comments: { $elemMatch: { _id: req.params.commentId } } },
                     { '$push': { 'comments.$.likedBy': req.userId } },
                     { returnOriginal: false }
                 );
-                return res.send({ newPost });
             }
 
+            return res.send({
+                status: 'OK',
+                results: []
+            });
         }
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Unexpected Error' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 

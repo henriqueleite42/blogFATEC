@@ -20,10 +20,22 @@ router.get('/', async (req, res) => {
     try {
         const posts = await Posts.find().populate('author').populate('category').select('-comments');
 
-        return res.send({ posts });
+        if ( ! posts.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
+        }
+
+        return res.send({
+            status: 'OK',
+            results: posts
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Finding Posts' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -32,10 +44,15 @@ router.get('/:postId', async (req, res) => {
     try {
         const post = await Posts.findById(req.params.postId).populate('author').populate('comments.author').populate('category').populate('comments.likedBy').select('+likedBy');
 
-        return res.send({ post });
+        return res.send({
+            status: 'OK',
+            results: post
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Finding Post' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -44,34 +61,70 @@ router.get('/author/:authorId', async (req, res) => {
     try {
         const post = await Posts.findOne({ author: req.params.authorId }).populate('author').populate('category').select('-comments');
 
-        return res.send({ post });
+        if ( ! post.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
+        }
+
+        return res.send({
+            status: 'OK',
+            results: post
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Finding Posts' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
 // Exibe todos os post de determinada Categoria
 router.get('/category/:categoryId', async (req, res) => {
     try {
-        const post = await Posts.find({ category: req.params.categoryId }).populate('author').populate('category').select('-comments');
+        const posts = await Posts.find({ category: req.params.categoryId }).populate('author').populate('category').select('-comments');
 
-        return res.send({ post });
+        if ( ! posts.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
+        }
+
+        return res.send({
+            status: 'OK',
+            results: posts
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Finding Posts' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
 // Exibe os posts com maior numero de likes
 router.get('/popular/:qtd', async (req, res) => {
     try {
-        const post = await Posts.find().sort({ likedBy: -1 }).limit(parseInt(req.params.qtd)).select(['-comments', '-text']);
+        const posts = await Posts.find().sort({ likedBy: -1 }).limit(parseInt(req.params.qtd)).select(['-comments', '-text']);
 
-        return res.send({ post });
+        if ( ! posts.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
+        }
+
+        return res.send({
+            status: 'OK',
+            results: posts
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Finding Posts' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -87,17 +140,31 @@ router.post('/', adm, async (req, res) => {
     try {
         const { category } = req.body;
 
+        const checkCat = await Categories.findByIdAndUpdate(category, { $inc: { uses: 1 } }, { new: true });
+
+        if ( ! checkCat.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: [],
+                message: 'Undefined Category'
+            });
+        }
+
         const post = await Posts.create({
             ...req.body,
             author: req.userId
         });
 
-        await Categories.findByIdAndUpdate(category, { $inc: { uses: 1 } }, { new: true });
 
-        return res.send({ post });
+        return res.send({
+            status: 'OK',
+            results: post
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Creating New Post' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -108,10 +175,15 @@ router.put('/:postId', adm, async (req, res) => {
 
         const post = await Posts.findByIdAndUpdate(req.params.postId, { title, text }, { new: true });
 
-        return res.send({ post });
+        return res.send({
+            status: 'OK',
+            results: post
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Updating New Post' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -127,10 +199,14 @@ router.delete('/:postId', adm, async (req, res) => {
 
         await Posts.findByIdAndRemove(req.params.postId);
 
-        return res.send({ ok: true });
+        return res.send({
+            status: 'OK'
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Error Deleting Post' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -145,31 +221,45 @@ router.put('/like/:postId', async (req, res) => {
     try {
         const post = await Posts.findOne({ _id: req.params.postId });
 
+        if ( ! checkCat.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: [],
+                message: 'Undefined Post'
+            });
+        }
+
         if (post == undefined) {
             return res.status(404).send({ error: 'Post Not Find' });
         } else {
             const likes = post.likedBy;
             if (likes != undefined && likes.includes(req.userId)) {
                 if ( likes.includes(req.userId) ) {
-                    const newPost = await Posts.findOneAndUpdate(
+                    await Posts.findOneAndUpdate(
                         { _id: req.params.postId },
                         { '$pull': { 'likedBy': req.userId } },
                         { returnOriginal: false }
                     );
-                    return res.send({ newPost });
+                    return res.send({
+                        status: 'OK'
+                    });
                 }
             } else {
-                const newPost = await Posts.findOneAndUpdate(
+                await Posts.findOneAndUpdate(
                     { _id: req.params.postId },
                     { '$push': { 'likedBy': req.userId } },
                     { returnOriginal: false }
                 );
-                return res.send({ newPost });
+                return res.send({
+                    status: 'OK'
+                });
             }
         }
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Unexpected Error' });
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 

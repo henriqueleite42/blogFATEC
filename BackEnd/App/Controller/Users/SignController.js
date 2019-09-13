@@ -34,12 +34,19 @@ router.post('/register', async (req, res) => {
 
         const user = await User.create( req.body );
 
-        res.cookie('blogFatec', generateToken({ id: user._id }), { maxAge: 259200000, httpOnly: true });
+        const token = generateToken({ id: user._id });
 
-        return res.send({ ok: true });
+        res.cookie('blogFatec', token, { maxAge: 259200000, httpOnly: true });
+
+        return res.send({
+            status: 'OK',
+            token: token
+        });
     } catch (err) {
         console.log(err);
-        return res.status(400).send({ error: 'Registration Fail.'});
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -58,11 +65,19 @@ router.post('/login', async (req, res) => {
             return res.status(400).send({ error: 'Invalid Password.'});
         }
 
-        res.cookie('blogFatec', 'Bearer'+generateToken({ id: user._id }), { maxAge: 259200000, httpOnly: true });
+        const token = generateToken({ id: user._id });
 
-        return res.send({ ok: true });
+        res.cookie('blogFatec', token, { maxAge: 259200000, httpOnly: true });
+
+        return res.send({
+            status: 'OK',
+            token: token
+        });
     } catch (err) {
-        return res.status(400).send({ error: 'Login Fail.'});
+        console.log(err);
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
@@ -70,9 +85,14 @@ router.post('/login', async (req, res) => {
 router.post('/logout', async (req, res) => {
     try {
         res.clearCookie('blogFATEC');
-        return res.send({ ok: true });
+        return res.send({
+            status: 'OK'
+        });
     } catch (err) {
-        return res.status(400).send({ error: 'Logout Fail.'});
+        console.log(err);
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR'
+        });
     }
 });
 
