@@ -2,22 +2,27 @@ const jwt = require('jsonwebtoken');
 const authKey = require('../../Config/Auth.json');
 
 module.exports = (req, res, next) => {
-    const authHeader = req.cookies.blogFATEC;
+    var token, scheme;
 
-    if (authHeader == undefined) {
+    if (typeof req.cookies.blogFATEC != 'undefined') {
+        token = req.cookies.blogFATEC;
+    } else if (typeof req.headers.authorization != 'undefined') {
+        var authHeader = req.headers.authorization;
+
+        const parts = authHeader.split(' ');
+
+        if (parts.length != 2) {
+            return res.status(401).send({ error: 'Token Malformated'});
+        }
+
+        [ scheme, token ] = parts;
+
+        if (!/^Bearer$/i.test(scheme)) {
+            return res.status(401).send({ error: 'Token Malformated' });
+        }
+
+    } else {
         return res.status(401).send({ error: 'No Token Provided' });
-    }
-
-    const parts = authHeader.split(' ');
-
-    if (parts.length != 2) {
-        return res.status(401).send({ error: 'Token Malformated'});
-    }
-
-    const [ scheme, token ] = parts;
-
-    if (!/^Bearer$/i.test(scheme)) {
-        return res.status(401).send({ error: 'Token Malformated' });
     }
 
     jwt.verify(token, authKey.secret, (err, decoded) => {
