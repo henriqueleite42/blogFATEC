@@ -9,18 +9,12 @@ const CommentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     }],
-    answer: {
-        type: mongoose.Schema.Types.ObjectId
-    },
     created: {
         type: Date,
         default: Date.now
     },
     modified: {
         type: Date
-    },
-    answer: {
-        type: mongoose.Schema.Types.ObjectId
     },
     author: {
         type: mongoose.Schema.Types.ObjectId,
@@ -34,7 +28,11 @@ const PostSchema = new mongoose.Schema({
         type: String,
         require: true
     },
-    text: {
+    ingredients: {
+        type: String,
+        require: true
+    },
+    directions: {
         type: String,
         require: true
     },
