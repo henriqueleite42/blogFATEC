@@ -45,7 +45,8 @@ router.post('/register', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -76,7 +77,8 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -91,7 +93,8 @@ router.post('/logout', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });

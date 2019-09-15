@@ -22,7 +22,8 @@ router.get('/', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -39,39 +40,26 @@ router.get('/:userId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
 
-// Delete User and User Comments
-router.delete('/:userId', async (req, res) => {
+// Manage BookMarks
+router.put('/bookmarks', async (req, res) => {
     try {
-
-        await Users.findByIdAndRemove(req.params.userId);
-
-        return res.send({
-            status: 'OK'
-        });
-    } catch (err) {
-        console.log(err);
-        return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
-        });
-    }
-});
-
-//BookMarks
-router.put('/bookmark/:postId', async (req, res) => {
-    try {
-        const user = await Users.findOne({ _id: req.userId });
+        const user = await Users.findOne(
+            { _id: req.userId },
+            { bookmarks: 1, _id: 0 }
+        );
 
         const bookmarks = user.bookmarks;
-        if (bookmarks != undefined && bookmarks.includes(req.params.postId)) {
-            if ( bookmarks.includes(req.params.postId) ) {
+        if (bookmarks != undefined && bookmarks.includes(req.query.postId)) {
+            if ( bookmarks.includes(req.query.postId) ) {
                 await Users.findOneAndUpdate(
                     { _id: req.userId },
-                    { '$pull': { 'bookmarks': req.params.postId } },
+                    { '$pull': { 'bookmarks': req.query.postId } },
                     { returnOriginal: false }
                 );
 
@@ -82,7 +70,7 @@ router.put('/bookmark/:postId', async (req, res) => {
         } else {
             await Users.findOneAndUpdate(
                 { _id: req.userId },
-                { '$push': { 'bookmarks': req.params.postId } },
+                { '$push': { 'bookmarks': req.query.postId } },
                 { returnOriginal: false }
             );
 
@@ -93,7 +81,26 @@ router.put('/bookmark/:postId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
+        });
+    }
+});
+
+// List Bookmarks
+router.get('/bookmarks', async (req, res) => {
+    try {
+        const bookmarks = await Users.findOne({ _id: req.userId }, { bookmarks: 1 }).select(['+bookmarks']);
+
+        return res.send({
+            status: 'OK',
+            results: bookmarks
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });

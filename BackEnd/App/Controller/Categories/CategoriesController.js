@@ -28,7 +28,8 @@ router.get('/', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -45,7 +46,8 @@ router.post('/', adm, async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -62,7 +64,8 @@ router.put('/:categoryId', adm, async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -80,7 +83,8 @@ router.delete('/:categoryId', adm, async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });

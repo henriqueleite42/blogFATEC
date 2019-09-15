@@ -3,6 +3,7 @@ const router = express.Router();
 
 const adm = require('../../Middleware/Adm');
 const auth = require('../../Middleware/AuthToken');
+const paginate = require('../../Middleware/Paginate');
 
 const Posts = require('../../Schemas/postSchema');
 const Categories = require('../../Schemas/categorySchema');
@@ -34,7 +35,8 @@ router.get('/', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -42,7 +44,20 @@ router.get('/', async (req, res) => {
 // Exibe um post especifico
 router.get('/:postId', async (req, res) => {
     try {
-        const post = await Posts.findById(req.params.postId).populate('author').populate('comments.author').populate('category').populate('comments.likedBy').select('+likedBy');
+        const post = await Posts.findById(req.params.postId)
+        .select('+likedBy')
+        .populate('author')
+        .populate('comments.author')
+        .populate('category', 'name')
+        .populate('comments.likedBy');
+
+        const { ingredients, directions } = post;
+
+        const ings = ingredients.split('<br><br>');
+        const dire = directions.split('<br><br>');
+
+        post.ingredients = ings;
+        post.directions = dire;
 
         return res.send({
             status: 'OK',
@@ -51,7 +66,8 @@ router.get('/:postId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -75,7 +91,8 @@ router.get('/author/:authorId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -99,15 +116,16 @@ router.get('/category/:categoryId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
 
 // Exibe os posts com maior numero de likes
-router.get('/popular/:qtd', async (req, res) => {
+router.get('/popular', async (req, res) => {
     try {
-        const posts = await Posts.find().sort({ likedBy: -1 }).limit(parseInt(req.params.qtd)).select(['-comments', '-text']);
+        const posts = await Posts.find().sort({ likedBy: -1 }).limit(parseInt(req.query.qtd)).select(['-comments', '-text']);
 
         if ( ! posts.length > 0 ) {
             return res.status(404).send({
@@ -123,7 +141,70 @@ router.get('/popular/:qtd', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
+        });
+    }
+});
+
+/***************************************************************************
+ *
+ *                       Paginação
+ *
+ ***************************************************************************/
+
+// Exibe os posts
+router.get('/paginate', paginate, async (req, res) => {
+    try {
+        const limit = 10;
+        const skip = limit * (parseInt(req.query.pageNo) - 1);
+
+        const posts = await Posts.find().skip(skip).limit(limit).select(['-comments', '-text']);
+
+        if ( ! posts.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
+        }
+
+        return res.send({
+            status: 'OK',
+            results: posts
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR',
+            results: []
+        });
+    }
+});
+
+// Exibe os posts com maior numero de likes
+router.get('/paginate/popular', paginate, async (req, res) => {
+    try {
+        const limit = 10;
+        const skip = limit * (parseInt(req.query.pageNo) - 1);
+
+        const posts = await Posts.find().sort({ likedBy: -1 }).skip(skip).limit(limit).select(['-comments', '-text']);
+
+        if ( ! posts.length > 0 ) {
+            return res.status(404).send({
+                status: 'ZERO_RESULTS',
+                results: []
+            });
+        }
+
+        return res.send({
+            status: 'OK',
+            results: posts
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(400).send({
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -163,7 +244,8 @@ router.post('/', adm, async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -182,7 +264,8 @@ router.put('/:postId', adm, async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -205,7 +288,8 @@ router.delete('/:postId', adm, async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -258,7 +342,8 @@ router.put('/like/:postId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });

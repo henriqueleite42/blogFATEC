@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
     },
     picture: {
         type: String,
-        // default: (Colocar o Hash da Imagem aqui)
+        default: 'img/defaultAvatarIcon.png'
     },
     status: {
         type: Number,

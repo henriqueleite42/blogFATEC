@@ -25,7 +25,8 @@ router.post('/:postId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -58,7 +59,8 @@ router.put('/:commentId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -86,7 +88,8 @@ router.delete('/:commentId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
@@ -136,7 +139,8 @@ router.put('/like/:commentId', async (req, res) => {
     } catch (err) {
         console.log(err);
         return res.status(400).send({
-            status: 'UNKNOWN_ERROR'
+            status: 'UNKNOWN_ERROR',
+            results: []
         });
     }
 });
