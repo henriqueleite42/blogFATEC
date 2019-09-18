@@ -145,4 +145,4 @@ router.put('/like/:commentId', async (req, res) => {
     }
 });
 
-module.exports = app => app.use('/comments', router);
+module.exports = app => app.use('/api/comments', router);

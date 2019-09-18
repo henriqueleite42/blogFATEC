@@ -89,4 +89,4 @@ router.delete('/:categoryId', adm, async (req, res) => {
     }
 });
 
-module.exports = app => app.use('/categories', router);
+module.exports = app => app.use('/api/categories', router);

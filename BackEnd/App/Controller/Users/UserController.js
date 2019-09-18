@@ -105,4 +105,4 @@ router.get('/bookmarks', async (req, res) => {
     }
 });
 
-module.exports = app => app.use('/users', router);
+module.exports = app => app.use('/api/users', router);
