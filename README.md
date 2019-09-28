@@ -1,4 +1,4 @@
-# blogFATEC
+# blogCulinaria
 Projeto para faculdade
 
 Utilizado:
